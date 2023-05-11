@@ -28,7 +28,7 @@ search.addEventListener("click", () => {
             return;
           }
 
-          error404.style.display = "block";
+          error404.style.display = "none";
           error404.classList.remove("fadeIn");
 
           const image = document.querySelector(".weather-box img");
@@ -43,9 +43,7 @@ search.addEventListener("click", () => {
           );
           const wind = document.querySelector(".weather-details .wind span");
 
-          image.src = "";
-          console.log(json.current_weather.weathercode);
-
+          image.src = "img/404.jpg";
           console.log("first finished");
 
           switch (json.current_weather.weathercode) {
@@ -56,9 +54,8 @@ search.addEventListener("click", () => {
           }
 
           console.log("case finished");
-          console.log("wind" + wind.innerHTML);
 
-          temperature.innerHTML = parseInt(json.current_weather.temperature);
+          temperature.innerHTML = parseInt(json.current_weather.temperature) + '<span>F</span>';
           wind.innerHTML = parseInt(json.current_weather.windspeed) + " Mph";
 
           weatherBox.style.display = "";
