@@ -24,42 +24,48 @@ search.addEventListener("click", () => {
             weatherDetails.style.display = "none";
             error404.style.display = "block";
             error404.classList.add("fadeIn");
+            console.log("ERROR IN 404");
             return;
           }
 
           error404.style.display = "block";
           error404.classList.remove("fadeIn");
 
-          const image = document.querySelector("weather-box img");
+          const image = document.querySelector(".weather-box img");
           const temperature = document.querySelector(
-            "weather-box .temperature"
+            ".weather-box .temperature"
           );
           const description = document.querySelector(
-            "weather-box .description"
+            ".weather-box .description"
           );
           const humidity = document.querySelector(
-            ".weather-box .humidity span"
+            ".weather-details .humidity span"
           );
-          const wind = document.querySelector(".weather-box .wind span");
+          const wind = document.querySelector(".weather-details .wind span");
 
-          // switch (json.current_weather) {
-          //     case'
-          // }
-        //   console.log(json);
-          let returnValues = json;
+          image.src = "";
+          console.log(json.current_weather.weathercode);
 
-        //   console.log(parseInt(returnValues.current_weather.temperature));
+          console.log("first finished");
 
-          document.addEventListener("DOMContentLoaded", function () {
-            temperature.innerHTML = `${parseInt(
-              returnValues.current_weather.temperature
-            )}<span> F`;
-          });
+          switch (json.current_weather.weathercode) {
+            case 3:
+              document.querySelector(".weather-box .description").innerHTML =
+                "Overcast";
+              break;
+          }
 
-        //   console.log(json);
-        //   console.log(json.current_weather.temperature);
+          console.log("case finished");
+          console.log("wind" + wind.innerHTML);
 
-          //   para.innerText = `${parseInt(json.current_weather.temperature)}`;
+          temperature.innerHTML = parseInt(json.current_weather.temperature);
+          wind.innerHTML = parseInt(json.current_weather.windspeed) + " Mph";
+
+          weatherBox.style.display = "";
+          weatherDetails.style.display = "";
+          weatherBox.classList.add("fadeIn");
+          weatherDetails.classList.add("fadeIn");
+          container.style.height = "690px";
         });
     })
     .catch((error) => {
