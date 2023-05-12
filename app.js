@@ -3,65 +3,53 @@ const search = document.querySelector(".search-box button");
 const weatherBox = document.querySelector(".weather-box");
 const weatherDetails = document.querySelector(".weather-details");
 const error404 = document.querySelector(".not-found");
+const input = document.querySelector(".search-box input");
+
+input.addEventListener("keydown", function (event) {
+  if (event.key === "Enter") {
+    search.click();
+  }
+});
 
 search.addEventListener("click", () => {
+  //Get lat and long from browser if supported and no cordinates are given.
   getLatLong()
     .then(({ lat, long }) => {
-      // console.log(
-      //   /^-?[\d,\s.]*$/.test(document.querySelector(".search-box input").value)
-      // );
-
-      // checkBoxCase = +document.querySelector(".search-box input").value;
-
-      // checkBoxCase = "39.742043, -104.991531";
-
-      // if (/^-?[\d,\s]*$/.test(checkBoxCase) === false) {
-      //   container.style.height = "400px";
-      //   weatherBox.style.display = "none";
-      //   weatherDetails.style.display = "none";
-      //   error404.style.display = "block";
-      //   error404.classList.add("fadeIn");
-      //   console.log("ERROR IN 404 catch");
-      //   return;
-      // }
-
-      //   document.querySelector(".search-box input").value = lat + " " + long;
-
+      //Get inputs from search box if there are any and pass lat and long into variables.
       const city = document.querySelector(".search-box input").value;
 
-      console.log(`${city} lat: ${lat} and long: ${long}`);
+      //Validate if city are cordinates.
+      validateLatLong = /^-?\d+(\.\d+)?,\s*-?\d+(\.\d+)?$/.test(city);
 
-      if (city !== "") {
-        // tempSplit = city.split(",");
-
-        [lat, long] = city.split(",").map((str) => parseFloat(str));
-
-        // lat = tempSplit[0];
-        // long = tempSplit[1];
-      } else {
+      // If city is blank use browser cordinates. Next if value is not cordinates then exit. Last parse input to lat and long variables.
+      if (city === "") {
         document.querySelector(".search-box input").value = lat + ", " + long;
+      } else if (validateLatLong == false) {
+        container.style.height = "400px";
+        weatherBox.style.display = "none";
+        weatherDetails.style.display = "none";
+        error404.style.display = "block";
+        error404.classList.add("fadeIn");
+        return;
+      } else if (city !== "") {
+        [lat, long] = city.split(",").map((str) => parseFloat(str));
       }
 
-      console.log(`${city} lat: ${lat} and long: ${long}`);
-
+      //Setup API variables. APIs with no keys
       const url1 = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${long}&current_weather=true&temperature_unit=fahrenheit&windspeed_unit=mph`;
 
       const url2 = `https://api.weather.gov/points/${lat},${long}`;
 
-      //   let url3 = ``;
-
+      //Get from API for first two API calls.
       Promise.all([fetch(url1), fetch(url2)])
         .then((response) =>
           Promise.all(response.map((responce) => responce.json()))
         )
-        // fetch(url2)
-        //   .then((response) => response.json())
 
+        //Place API JSON into variables for later.
         .then((json) => {
           const json1 = json[0];
           const json2 = json[1];
-          console.log(json1);
-          console.log(json2);
 
           if (json1.error === true || json2.status == "404") {
             container.style.height = "400px";
@@ -73,28 +61,19 @@ search.addEventListener("click", () => {
             return;
           }
 
+          //Define new API URL that was gotten from second API call previously.
           url3 = json2.properties.forecast;
 
-          //   let json3;
-
+          //Get API JSON information
           fetch(url3)
             .then((response) => response.json())
             .then((data) => {
               const json3 = data;
-              console.log(json3);
 
-              if (json1.error === true || json2.status === "404") {
-                container.style.height = "400px";
-                weatherBox.style.display = "none";
-                weatherDetails.style.display = "none";
-                error404.style.display = "block";
-                error404.classList.add("fadeIn");
-                console.log("ERROR IN 404");
-                return;
-              }
               error404.style.display = "none";
               error404.classList.remove("fadeIn");
 
+              //Define variables for later to shorten code and easier to read.
               const image = document.querySelector(".weather-box img");
               const temperature = document.querySelector(
                 ".weather-box .temperature"
@@ -102,6 +81,9 @@ search.addEventListener("click", () => {
               const description = document.querySelector(
                 ".weather-box .description"
               );
+
+              const location = document.querySelector(".weather-box .location");
+
               const humidity = document.querySelector(
                 ".weather-details .humidity span"
               );
@@ -109,28 +91,90 @@ search.addEventListener("click", () => {
                 ".weather-details .wind span"
               );
 
-              image.src = "img/404.jpg";
-              console.log("first finished");
-
+              //Switch case to go through all the returned weather codes to set the image to the correct weather condition.
               switch (json1.current_weather.weathercode) {
+                case 0:
+                case 1:
+                  document.querySelector(
+                    ".weather-box .description"
+                  ).innerHTML = "Clear Sky";
+                  image.src = "img/clearsky.jpg";
+                  break;
+
+                case 2:
                 case 3:
                   document.querySelector(
                     ".weather-box .description"
                   ).innerHTML = "Overcast";
+                  image.src = "img/overcast.jpg";
+
                   break;
+
+                case 45:
+                case 48:
+                  document.querySelector(
+                    ".weather-box .description"
+                  ).innerHTML = "Fog";
+                  image.src = "img/fog.jpg";
+
+                  break;
+
+                case 51:
+                case 53:
+                case 55:
+                case 56:
+                case 57:
+                case 61:
+                case 63:
+                case 65:
+                case 66:
+                case 67:
+                case 80:
+                case 81:
+                case 82:
+                case 95:
+                case 96:
+                  document.querySelector(
+                    ".weather-box .description"
+                  ).innerHTML = "Rain";
+                  image.src = "img/rain.jpg";
+
+                  break;
+
+                case 71:
+                case 73:
+                case 75:
+                case 77:
+                case 85:
+                case 86:
+                  document.querySelector(
+                    ".weather-box .description"
+                  ).innerHTML = "Snow";
+                  image.src = "img/snow.jpg";
+
+                  break;
+                default:
+                  image.src = "";
               }
 
-              console.log("case finished");
-
+              //Pull data from JSON push to the frontend for display
               temperature.innerHTML =
                 parseInt(json1.current_weather.temperature) + "<span>F</span>";
+
               wind.innerHTML =
                 parseInt(json1.current_weather.windspeed) + " Mph";
 
+              location.innerHTML =
+                json2.properties.relativeLocation.properties.city +
+                ", " +
+                json2.properties.relativeLocation.properties.state;
+
               description.innerHTML = json3.properties.periods[0].shortForecast;
+
               humidity.innerHTML =
                 json3.properties.periods[0].relativeHumidity.value + `%`;
 
+              //Final style updates.
               weatherBox.style.display = "";
               weatherDetails.style.display = "";
               weatherBox.classList.add("fadeIn");
@@ -145,37 +189,7 @@ search.addEventListener("click", () => {
     });
 });
 
-// var x = document.getElementById("demo");
-// let lat;
-// let long;
-
-// const para = document.querySelector("p");
-
-// function getLocation() {
-//   if (navigator.geolocation) {
-//     navigator.geolocation.getCurrentPosition(showPosition);
-//   } else {
-//     console.log("Geolocation is not supported by this browser.");
-//   }
-//   return {lat, long}
-// }
-
-// function showPosition(position) {
-//   lat = position.coords.latitude;
-//   long = position.coords.longitude;
-//   document.querySelector(".search-box input").value = lat + " " + long;
-//   return { Latitude: lat, longitude: long };
-// }
-
-// fetch(
-//   "https://api.open-meteo.com/v1/forecast?latitude=33.68&longitude=-84.75&current_weather=true&temperature_unit=fahrenheit&windspeed_unit=mph"
-// )
-//   .then((response) => response.json())
-//   .then((json) => {
-//     console.log(json);
-//     para.innerText = `${parseInt(json.current_weather.temperature)}`;
-//   });
-
+// Functionm to get the lat and long from browser if possible.
 function getLatLong() {
   return new Promise((resolve, reject) => {
     if (navigator.geolocation) {

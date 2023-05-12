@@ -76,8 +76,9 @@ body {
 }
 
 .weather-box img {
-  width: 60%;
+  width: 100%;
   margin-top: 30px;
+  border-radius: 18px;
 }
 
 .weather-box .temperature {
@@ -98,6 +99,13 @@ body {
 .weather-box .description {
   color: #22223b;
   font-size: 22px;
+  font-weight: 500;
+  text-transform: capitalize;
+}
+
+.weather-box .location {
+  color: #22223b;
+  font-size: 25px;
   font-weight: 500;
   text-transform: capitalize;
 }
@@ -156,6 +164,7 @@ body {
 }
 
 .not-found img {
+  height: 70%;
   width: 70%;
 }
 
