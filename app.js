@@ -179,7 +179,7 @@ search.addEventListener("click", () => {
               weatherDetails.style.display = "";
               weatherBox.classList.add("fadeIn");
               weatherDetails.classList.add("fadeIn");
-              container.style.height = "720px";
+              container.style.height = "auto";
             });
         })
         .catch((error) => console.error(error));
